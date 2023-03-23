@@ -1,0 +1,16 @@
+FROM gcr.io/deeplearning-platform-release/base-gpu
+
+RUN apt update
+
+WORKDIR /root
+RUN git clone https://github.com/huggingface/peft.git
+RUN pip install /root/peft 
+RUN git clone https://huggingface.co/spaces/smangrul/peft-lora-sd-dreambooth
+RUN pip install -r /root/peft-lora-sd-dreambooth/requirements.txt
+
+RUN pip install torch==1.13.1+cu117 torchvision==0.14.1+cu117 --extra-index-url https://download.pytorch.org/whl/cu117
+
+ENV LD_LIBRARY_PATH $LD_LIBRARY_PATH:/usr/local/cuda/lib64
+RUN ln -sf /usr/local/cuda/lib64/libcudart.so.11.0 /usr/local/cuda/lib64/libcudart.so
+
+RUN accelerate config default --mixed_precision=fp16
